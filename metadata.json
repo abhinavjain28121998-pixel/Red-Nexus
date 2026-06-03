@@ -1,0 +1,8 @@
+{
+  "name": "RED.NEXUS",
+  "description": "A premium technology blogging platform with a futuristic, high-end design, featuring articles on AI, software, gadgets, and emerging tech.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
