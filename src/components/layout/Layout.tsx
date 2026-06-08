@@ -31,7 +31,7 @@ export function Layout() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#050505] text-white selection:bg-red-500/30">
+    <div className="min-h-screen flex flex-col bg-theme-bg text-theme-text transition-colors duration-300 selection:bg-red-500/30">
       <ScrollRestoration />
       <JsonLd data={orgSchema} />
       <JsonLd data={websiteSchema} />

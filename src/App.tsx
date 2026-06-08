@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Layout } from "./components/layout/Layout";
+import { ThemeProvider } from "./components/ThemeContext";
 import Home from "./pages/Home";
 import BlogListing from "./pages/BlogListing";
 import SinglePost from "./pages/SinglePost";
@@ -40,5 +41,10 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
+  );
 }
+

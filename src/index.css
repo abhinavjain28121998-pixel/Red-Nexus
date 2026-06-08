@@ -19,6 +19,18 @@
 
   --color-neon-blue: #0ea5e9;
   --color-neon-purple: #8b5cf6;
+
+  /* Seamless dynamic theme color mappings */
+  --color-theme-bg: var(--theme-bg);
+  --color-theme-card: var(--theme-card);
+  --color-theme-card-elevated: var(--theme-card-elevated);
+  --color-theme-border: var(--theme-border);
+  --color-theme-text: var(--theme-text);
+  --color-theme-text-muted: var(--theme-text-muted);
+  --color-theme-text-dim: var(--theme-text-dim);
+  --color-theme-heading: var(--theme-heading);
+  --color-theme-input-bg: var(--theme-input-bg);
+  --color-theme-nav-bg: var(--theme-nav-bg);
 }
 
 @layer base {
@@ -29,15 +41,39 @@
     --card-foreground: #030712;
     --border: #e2e8f0;
     --ring: #3b82f6;
+
+    /* Light Theme (Daylight Intel Mode) */
+    --theme-bg: #f9fafb;
+    --theme-card: #ffffff;
+    --theme-card-elevated: #f3f4f6;
+    --theme-border: rgba(0, 0, 0, 0.08);
+    --theme-text: #171717;
+    --theme-text-muted: #404040;
+    --theme-text-dim: #737373;
+    --theme-heading: #0a0a0a;
+    --theme-input-bg: #ffffff;
+    --theme-nav-bg: rgba(255, 255, 255, 0.85);
   }
 
   .dark {
-    --background: #030712;
+    --background: #050505;
     --foreground: #f8fafc;
-    --card: #0f172a;
+    --card: #0a0a0a;
     --card-foreground: #f8fafc;
-    --border: #1e293b;
+    --border: rgba(255, 255, 255, 0.1);
     --ring: #3b82f6;
+
+    /* Dark Theme (Intrusion Cyber Mode) */
+    --theme-bg: #050505;
+    --theme-card: #0a0a0a;
+    --theme-card-elevated: #0c0c0c;
+    --theme-border: rgba(255, 255, 255, 0.1);
+    --theme-text: #ffffff;
+    --theme-text-muted: #d1d5db;
+    --theme-text-dim: #9ca3af;
+    --theme-heading: #ffffff;
+    --theme-input-bg: #050505;
+    --theme-nav-bg: rgba(5, 5, 5, 0.85);
   }
 }
 
@@ -46,9 +82,10 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-[var(--background)] text-[var(--foreground)] antialiased transition-colors duration-300;
+    @apply bg-theme-bg text-theme-text antialiased transition-colors duration-300;
   }
 }
+
 
 @layer utilities {
   .glass {

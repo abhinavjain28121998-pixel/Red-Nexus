@@ -1,9 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { ThemeToggle } from "../ThemeToggle";
-import { Menu, X, Search } from "lucide-react";
+import { Menu, X, Search, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/utils";
+import { useTheme } from "../ThemeContext";
 
 const links = [
   { name: "Home", href: "/" },
@@ -16,16 +16,19 @@ const links = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 bg-[#050505] border-b border-white/10 tech-nav">
+      <nav className="fixed top-0 w-full z-50 bg-theme-bg/90 backdrop-blur-md border-b border-theme-border transition-colors duration-300 tech-nav">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center gap-2 group">
-                <span className="text-2xl font-black tracking-tighter italic uppercase text-white">RED<span className="text-red-500">.</span>NEXUS</span>
+                <span className="text-2xl font-black tracking-tighter italic uppercase text-theme-text">
+                  RED<span className="text-red-500">.</span>NEXUS
+                </span>
               </Link>
             </div>
 
@@ -39,14 +42,14 @@ export function Navbar() {
                     className={cn(
                       "px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 relative group",
                       location.pathname === link.href
-                        ? "text-white"
-                        : "text-white/50 hover:text-white"
+                        ? "text-theme-text"
+                        : "text-theme-text-dim hover:text-theme-text"
                     )}
                   >
                     {location.pathname === link.href && (
                       <motion.div
                         layoutId="navbar-indicator"
-                        className="absolute inset-0 bg-white/10 z-[-1]"
+                        className="absolute inset-0 bg-theme-text/10 z-[-1]"
                         initial={false}
                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                       />
@@ -58,22 +61,35 @@ export function Navbar() {
             </div>
 
             {/* Right section */}
-            <div className="hidden md:flex items-center gap-4">
-              <button className="p-2 text-gray-400 hover:text-white transition-colors">
+            <div className="flex items-center gap-2 md:gap-4">
+              <button className="p-2 text-theme-text-dim hover:text-theme-text transition-colors" aria-label="Search">
                 <Search className="w-5 h-5" />
               </button>
-              <ThemeToggle />
-              <button className="bg-white text-black text-[10px] font-bold uppercase tracking-widest px-6 py-2.5 hover:bg-red-500 hover:text-white transition-all">
-                Subscribe
+
+              <button
+                onClick={toggleTheme}
+                className="p-2 text-theme-text-dim hover:text-theme-text hover:bg-theme-text/5 rounded-full transition-all duration-300 flex items-center justify-center"
+                aria-label="Toggle visual theme"
+                id="theme-toggle-btn"
+              >
+                {theme === "dark" ? (
+                  <Sun className="w-5 h-5 text-yellow-500 hover:scale-115 transition-transform" />
+                ) : (
+                  <Moon className="w-5 h-5 text-indigo-600 hover:scale-115 transition-transform" />
+                )}
+              </button>
+
+              <button className="hidden sm:block bg-red-600 text-white text-xs font-bold uppercase tracking-widest px-6 py-2.5 hover:bg-theme-text hover:text-theme-bg transition-all duration-300 rounded-md">
+                Join Newsletter
               </button>
             </div>
 
             {/* Mobile menu button */}
-            <div className="flex md:hidden items-center gap-4">
-              <ThemeToggle />
+            <div className="flex md:hidden items-center">
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="text-gray-400 hover:text-white p-2"
+                className="text-theme-text-dim hover:text-theme-text p-2"
+                aria-label="Toggle menu"
               >
                 {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
@@ -89,7 +105,7 @@ export function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden fixed inset-0 z-40 bg-[#050505] pt-24 pb-6 px-4"
+            className="md:hidden fixed inset-0 z-40 bg-theme-bg pt-24 pb-6 px-4 overscroll-y-none transition-colors duration-300"
           >
             <div className="flex flex-col space-y-4">
               {links.map((link) => (
@@ -98,23 +114,26 @@ export function Navbar() {
                   to={link.href}
                   onClick={() => setIsOpen(false)}
                   className={cn(
-                    "block px-4 py-4 text-[10px] font-bold tracking-widest uppercase border border-white/10",
+                    "block px-4 py-4 text-xs font-bold tracking-widest uppercase border border-theme-border rounded-md",
                     location.pathname === link.href
                       ? "bg-red-600 text-white border-red-500"
-                      : "text-white/50 hover:bg-white/10 hover:text-white"
+                      : "text-theme-text-dim hover:bg-theme-text/5 hover:text-theme-text"
                   )}
                 >
                   {link.name}
                 </Link>
               ))}
               <div className="mt-8 relative">
-                 <input 
-                   type="text" 
-                   placeholder="SEARCH ARTICLES..." 
-                   className="w-full bg-[#050505] border border-white/10 px-4 py-4 text-white pl-12 focus:outline-none focus:border-white/30 text-[10px] font-bold uppercase tracking-widest"
-                 />
-                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search articles..."
+                  className="w-full bg-theme-card border border-theme-border px-4 py-4 rounded-md text-theme-text pl-12 focus:outline-none focus:border-red-500/50 text-sm font-medium focus:ring-1 focus:ring-red-500/50 transition-all placeholder:text-theme-text-dim/50"
+                />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-theme-text-dim/50" />
               </div>
+              <button className="bg-red-600 text-white text-xs font-bold uppercase tracking-widest px-6 py-4 mt-4 hover:bg-theme-text hover:text-theme-bg transition-colors duration-300 rounded-md w-full">
+                Join Newsletter
+              </button>
             </div>
           </motion.div>
         )}
@@ -122,3 +141,4 @@ export function Navbar() {
     </>
   );
 }
+

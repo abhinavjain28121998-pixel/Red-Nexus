@@ -52,31 +52,31 @@ export default function BlogListing() {
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-[80px] font-black uppercase tracking-tighter italic text-white mb-6 leading-[0.85]"
+            className="text-5xl md:text-7xl font-black uppercase tracking-tight text-white mb-6 leading-tight"
           >
-            Editorial<br className="hidden md:block" /><span className="text-red-500">_</span>Archive
+            Editorial<br className="hidden md:block" /> <span className="text-red-500">Archive</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-white/50 max-w-2xl font-bold tracking-tight"
+            className="text-xl text-gray-400 max-w-2xl font-medium tracking-tight"
           >
             Browse our complete collection of deep dives, analyses, and research papers across the technology landscape.
           </motion.p>
         </div>
 
         {/* Filters and Search */}
-        <div className="flex flex-col lg:flex-row gap-6 mb-12 items-center justify-between bg-[#050505] p-4 border border-white/10">
+        <div className="flex flex-col lg:flex-row gap-6 mb-12 items-center justify-between bg-[#0a0a0a] p-4 border border-white/10 rounded-xl">
           {/* Categories */}
           <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 w-full lg:w-auto hide-scrollbar">
             <button
               onClick={() => handleCategoryChange(null)}
               className={cn(
-                "px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-300",
+                "px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-300",
                 activeCategory === null 
                   ? "bg-white text-black" 
-                  : "bg-white/5 text-white/50 hover:bg-white/10 hover:text-white"
+                  : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
               )}
             >
               All Topics
@@ -86,10 +86,10 @@ export default function BlogListing() {
                 key={category.id}
                 onClick={() => handleCategoryChange(category.slug)}
                 className={cn(
-                  "px-5 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-300",
+                  "px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-300",
                   activeCategory === category.slug
                     ? "bg-red-600 text-white"
-                    : "bg-white/5 text-white/50 hover:bg-white/10 hover:text-white"
+                    : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
                 )}
               >
                 {category.name}
@@ -98,14 +98,14 @@ export default function BlogListing() {
           </div>
 
           {/* Search */}
-          <div className="relative w-full lg:w-72 shrink-0">
+          <div className="relative w-full lg:w-80 shrink-0">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <input
               type="text"
               placeholder="Search intelligence..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#050505] border border-white/10 rounded-full pl-11 pr-4 py-2.5 text-white text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-red-500/50 transition-colors placeholder:text-white/30"
+              className="w-full bg-[#050505] border border-white/10 rounded-full pl-11 pr-4 py-3 text-white text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-red-500/50 transition-colors placeholder:text-gray-500"
             />
           </div>
         </div>
