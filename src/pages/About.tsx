@@ -1,19 +1,69 @@
-import { motion } from "motion/react";
-import { Server, ShieldAlert, Cpu } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Server, ShieldAlert, Cpu, ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 import { JsonLd } from "../components/seo/JsonLd";
+import { MetaTags } from "../components/seo/MetaTags";
 
 export default function About() {
   const baseUrl = import.meta.env.VITE_APP_URL || "https://rednexus.com";
+  
+  const faqs = [
+    {
+      question: "What core topics does RED.NEXUS investigate?",
+      answer: "We focus on three primary computational pillars: advanced neural architectures (LLMs, neural networks, translation models), cybersecurity frameworks (zero-trust infrastructure, container hardening, novel exploit vectors), and next-generation silicon-hardware limits (semiconductor fab challenges, chip layouts, quantum compute bounds)."
+    },
+    {
+      question: "Are articles on RED.NEXUS generated using AI text formats?",
+      answer: "No. RED.NEXUS strictly rejects automated or AI-generated copy. Every publication, insight, and research Brief on our platform is authored, peer-reviewed, and verified by human systems design specialists, cybersecurity investigators, and research engineers."
+    },
+    {
+      question: "How is RED.NEXUS funded, and is there an editorial bias?",
+      answer: "RED.NEXUS operates as an independent technical publisher. We maintain zero vendor sponsorship inside our editorial pipelines. All analyses are completely neutral, peer-reviewed, and strictly backed by hardware benchmarks, whitepaper audits, and public code repositories rather than corporate PR marketing briefs."
+    },
+    {
+      question: "Can technical researchers submit anonymous articles or hardware security tips?",
+      answer: "Yes, we encourage security researchers, systems engineering groups, and compute hardware experts to share peer-verified findings. Technical tips can be securely submitted via our secure terminal channels listed on our connection terminal page."
+    }
+  ];
+
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
   const schema = {
     "@context": "https://schema.org",
-    "@type": "AboutPage",
-    "name": "About RED.NEXUS",
-    "description": "RED.NEXUS is a premium technology publication dedicated to high-signal, deeply researched reporting on the frontiers of computation.",
-    "url": `${baseUrl}/about`
+    "@graph": [
+      {
+        "@type": "AboutPage",
+        "@id": `${baseUrl}/about#aboutpage`,
+        "url": `${baseUrl}/about`,
+        "name": "About RED.NEXUS — Premium Technical Compute Intelligence",
+        "description": "RED.NEXUS is a premium technology publication dedicated to high-signal, deeply researched reporting on computation, AI architectures, and infrastructure pipelines."
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${baseUrl}/about#faq`,
+        "mainEntity": faqs.map((faq) => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      }
+    ]
   };
 
   return (
     <div className="w-full bg-[#050505] pb-24">
+      <MetaTags 
+        title="Our Mission & Tech Intelligence Framework"
+        description="Learn more about RED.NEXUS. We cut through the daily tech product hype to investigate advanced microarchitectures, AI neural models, cryptography, and semiconductor fabrications."
+        keywords="computation mission, independent publishing, research methodology, hardware systems auditing, technology analytics expert"
+      />
       <JsonLd data={schema} />
       {/* Hero */}
       <div className="relative py-24 overflow-hidden isolate">
@@ -75,6 +125,61 @@ export default function About() {
              </div>
            ))}
         </div>
+
+        {/* Dynamic AEO FAQ Accordion Panel */}
+        <div className="py-24 border-t border-white/10 mt-12 max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight text-white mb-4">
+              AEO <span className="text-red-500">Insights</span> & Methodology
+            </h2>
+            <p className="text-gray-400 text-base max-w-xl mx-auto">
+              Direct, peer-reviewed operational answers to understand how we produce independent computation briefings.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => {
+              const isOpen = openFaq === index;
+              return (
+                <div 
+                  key={index} 
+                  className="border border-white/5 bg-[#0a0a0a]/40 rounded-xl overflow-hidden transition-all duration-300"
+                >
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    className="w-full flex items-center justify-between p-6 text-left hover:bg-[#0a0a0a] transition-all"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="text-base md:text-lg font-bold text-white pr-4">
+                      {faq.question}
+                    </span>
+                    <span className="text-red-500 shrink-0">
+                      {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: "easeInOut" }}
+                      >
+                        <div className="px-6 pb-6 pt-2 border-t border-white/5">
+                          <p className="text-gray-400 text-sm leading-relaxed font-medium">
+                            {faq.answer}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
     </div>
   );

@@ -4,17 +4,29 @@ import { ArrowLeft, Share2, Bookmark, List, Type, Sliders } from "lucide-react";
 import { mockPosts } from "../data/mock";
 import { cn } from "../lib/utils";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
-import { PostCard } from "../components/ui/PostCard";
 import { JsonLd } from "../components/seo/JsonLd";
+import { RelatedArticles } from "../components/ui/RelatedArticles";
+import { MetaTags } from "../components/seo/MetaTags";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
 import GithubSlugger from "github-slugger";
 import { useEffect, useState, useMemo } from "react";
+import { SinglePostSkeleton } from "../components/ui/Skeleton";
 
 export default function SinglePost() {
   const { slug } = useParams();
   const post = mockPosts.find((p) => p.slug === slug);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [slug]);
 
   const [fontSize, setFontSize] = useState<"sm" | "base" | "lg" | "xl">(() => {
     const saved = localStorage.getItem("reader-font-size");
@@ -130,27 +142,9 @@ export default function SinglePost() {
     return <Navigate to="/blog" replace />;
   }
 
-  const relatedPosts = useMemo(() => {
-    const otherPosts = mockPosts.filter((p) => p.id !== post.id);
-    const scored = otherPosts.map((p) => {
-      let score = 0;
-      if (p.category.id === post.category.id) {
-        score += 10;
-      }
-      const commonTags = p.tags.filter((t) => post.tags.includes(t));
-      score += commonTags.length * 2;
-      return { post: p, score };
-    });
-
-    scored.sort((a, b) => {
-      if (b.score !== a.score) {
-        return b.score - a.score;
-      }
-      return new Date(b.post.publishedAt).getTime() - new Date(a.post.publishedAt).getTime();
-    });
-
-    return scored.map((item) => item.post).slice(0, 3);
-  }, [post.id, post.category.id, post.tags]);
+  if (isLoading) {
+    return <SinglePostSkeleton />;
+  }
 
   const baseUrl = import.meta.env.VITE_APP_URL || "https://rednexus.com";
   const postUrl = `${baseUrl}/blog/${post.slug}`;
@@ -217,19 +211,28 @@ export default function SinglePost() {
         className="fixed top-0 left-0 right-0 h-1.5 z-50 origin-left"
         style={{ scaleX, backgroundColor }}
       />
+      <MetaTags 
+        title={post.title}
+        description={post.excerpt}
+        keywords={`${post.category.name.toLowerCase()}, ${post.tags.join(', ')}, computation, research`}
+        ogImage={post.coverImage}
+        ogType="article"
+        canonicalPath={`/blog/${post.slug}`}
+        authorName={post.author.name}
+      />
       <JsonLd data={articleSchema} />
       <JsonLd data={breadcrumbSchema} />
       {/* Hero Image & Title Section */}
-      <div className="relative h-[60vh] min-h-[500px] w-full mt-[-80px]">
-        <div className="absolute inset-0 bg-theme-bg/80 z-10 transition-colors duration-300" />
-        <div className="absolute inset-0 bg-gradient-to-t from-theme-bg via-theme-bg/40 to-transparent z-10 transition-colors duration-300" />
+      <div className="relative min-h-[60vh] md:min-h-[500px] lg:min-h-[600px] w-full mt-[-80px] flex items-end pt-32 pb-12 overflow-hidden">
         <img 
           src={post.coverImage} 
           alt={post.title} 
-          className="w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
         />
+        <div className="absolute inset-0 bg-theme-bg/80 z-10 transition-colors duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-theme-bg via-theme-bg/40 to-transparent z-10 transition-colors duration-300" />
         
-        <div className="absolute bottom-0 left-0 w-full z-20 pb-16">
+        <div className="relative w-full z-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link to="/blog" className="inline-flex items-center gap-2 text-theme-text-dim hover:text-theme-text transition-colors mb-8 font-medium text-sm">
               <ArrowLeft className="w-4 h-4" /> Back to Intelligence
@@ -253,7 +256,7 @@ export default function SinglePost() {
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-4xl md:text-6xl lg:text-7xl leading-tight font-black tracking-tight uppercase text-theme-text mb-8"
+              className="text-4xl md:text-6xl lg:text-7xl leading-tight font-black tracking-tight uppercase text-theme-text mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.12)] selection:bg-red-500/30"
             >
               {post.title}
             </motion.h1>
@@ -507,27 +510,12 @@ export default function SinglePost() {
         </div>
       </div>
 
-      {/* Related Posts */}
-      {relatedPosts.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/10 mt-16">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-            <div>
-              <p className="text-red-500 font-mono text-xs uppercase tracking-widest mb-2 font-bold">// DEEPEN YOUR UNDERSTANDING</p>
-              <h2 className="text-3xl md:text-4xl font-extrabold uppercase italic tracking-tight text-white">
-                Related <span className="text-red-500">Articles</span>
-              </h2>
-            </div>
-            <p className="text-gray-400 text-sm max-w-md">
-              Explore more curated analysis, strategic insights, and advanced technical literature from our intelligence team.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {relatedPosts.map((relatedPost, i) => (
-              <PostCard key={relatedPost.id} post={relatedPost} index={i} />
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Related Articles */}
+      <RelatedArticles 
+        currentPostId={post.id} 
+        currentTags={post.tags} 
+        currentCategoryId={post.category.id} 
+      />
     </article>
   );
 }

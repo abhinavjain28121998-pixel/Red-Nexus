@@ -2,6 +2,7 @@ import { Outlet, ScrollRestoration } from "react-router-dom";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { JsonLd } from "../seo/JsonLd";
+import { SearchModal } from "../ui/SearchModal";
 
 export function Layout() {
   const baseUrl = import.meta.env.VITE_APP_URL || "https://rednexus.com";
@@ -35,11 +36,14 @@ export function Layout() {
       <ScrollRestoration />
       <JsonLd data={orgSchema} />
       <JsonLd data={websiteSchema} />
-      <Navbar />
+      <header className="fixed top-0 left-0 right-0 z-50 w-full flex flex-col bg-theme-bg/90 backdrop-blur-md border-b border-theme-border transition-colors duration-300" id="site-header">
+        <Navbar />
+      </header>
       <main className="flex-grow pt-20">
         <Outlet />
       </main>
       <Footer />
+      <SearchModal />
     </div>
   );
 }

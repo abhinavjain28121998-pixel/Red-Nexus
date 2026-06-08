@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { Mail, MapPin, MessagesSquare } from "lucide-react";
 import { JsonLd } from "../components/seo/JsonLd";
+import { MetaTags } from "../components/seo/MetaTags";
 
 export default function Contact() {
   const baseUrl = import.meta.env.VITE_APP_URL || "https://rednexus.com";
@@ -14,6 +15,11 @@ export default function Contact() {
 
   return (
     <div className="w-full bg-[#050505] pb-24 pt-24 min-h-screen">
+      <MetaTags 
+        title="Establish Contact Matrix"
+        description="Connect securely with RED.NEXUS. Submit editorial tips, feedback, partnership proposals, or corrections directly to our newsdesk terminal."
+        keywords="security tipped articles, independent news submission, engineering feedback, pitch editorial"
+      />
       <JsonLd data={schema} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         

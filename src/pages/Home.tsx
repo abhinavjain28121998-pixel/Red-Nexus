@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { mockPosts } from "../data/mock";
 import { PostCard } from "../components/ui/PostCard";
 import { JsonLd } from "../components/seo/JsonLd";
+import { MetaTags } from "../components/seo/MetaTags";
 
 export default function Home() {
   const featuredPost = mockPosts.find(p => p.featured) || mockPosts[0];
@@ -11,16 +12,67 @@ export default function Home() {
   const latestPosts = mockPosts.filter(p => p.id !== featuredPost.id && !trendingPosts.includes(p)).slice(0, 4);
 
   const baseUrl = import.meta.env.VITE_APP_URL || "https://rednexus.com";
+  
   const schema = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "RED.NEXUS - The Future of Technology",
-    "description": "Premium editorial covering artificial intelligence, spatial computing, and the hardware that builds tomorrow.",
-    "url": baseUrl
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${baseUrl}/#webpage`,
+        "url": baseUrl,
+        "name": "RED.NEXUS — Deciphering the Future of Advanced Compute",
+        "description": "Premium editorial covering artificial intelligence, spatial computing, and the hardware that builds tomorrow.",
+        "isPartOf": {
+          "@id": `${baseUrl}/#website`
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${baseUrl}/#website`,
+        "url": baseUrl,
+        "name": "RED.NEXUS",
+        "description": "High-signal technology publication covering deep compute and infrastructure pipelines.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": `${baseUrl}/blog?search={search_term_string}`
+          },
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": `${baseUrl}/#faq`,
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What topics does RED.NEXUS cover?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "RED.NEXUS specializes in premium, high-signal technical journalism covering advanced microarchitectures, artificial intelligence topologies, cloud security, and next-generation developer tooling."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who writes for RED.NEXUS?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Our reports, briefings, and analyses are written and peer-reviewed by engineering leaders, systems architects, and veteran security scholars."
+            }
+          }
+        ]
+      }
+    ]
   };
 
   return (
     <div className="w-full">
+      <MetaTags 
+        title="Actionable Intelligence on Advanced Compute"
+        description="RED.NEXUS is a premium technology publication dedicated to high-signal, deeply researched reporting on computation, artificial intelligence, and cybersecurity."
+        keywords="advanced compute, artificial intelligence topologies, hardware semiconductor systems, cybersecurity infrastructure, deep search, technical blog"
+      />
       <JsonLd data={schema} />
       {/* Hero Section */}
       <section className="relative pt-24 pb-32 overflow-hidden">

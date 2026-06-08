@@ -1,0 +1,6 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Link to sitemap.xml
+Sitemap: https://red-nexus-omega.vercel.app/sitemap.xml

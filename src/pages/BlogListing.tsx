@@ -6,6 +6,8 @@ import { mockPosts, categories } from "../data/mock";
 import { PostCard } from "../components/ui/PostCard";
 import { cn } from "../lib/utils";
 import { JsonLd } from "../components/seo/JsonLd";
+import { MetaTags } from "../components/seo/MetaTags";
+import { BlogCardSkeleton } from "../components/ui/Skeleton";
 
 export default function BlogListing() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -13,10 +15,20 @@ export default function BlogListing() {
   
   const [activeCategory, setActiveCategory] = useState<string | null>(initialCategory);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setActiveCategory(searchParams.get("category"));
   }, [searchParams]);
+
+  // Simulate modern analytical data fetching loader when active filters change
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [activeCategory, searchQuery]);
 
   const handleCategoryChange = (slug: string | null) => {
     setActiveCategory(slug);
@@ -29,8 +41,12 @@ export default function BlogListing() {
 
   const filteredPosts = mockPosts.filter((post) => {
     const matchesCategory = activeCategory ? post.category.slug === activeCategory : true;
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = 
+      post.title.toLowerCase().includes(query) || 
+      post.excerpt.toLowerCase().includes(query) ||
+      post.tags?.some(tag => tag.toLowerCase().includes(query)) ||
+      post.category?.name.toLowerCase().includes(query);
     return matchesCategory && matchesSearch;
   });
 
@@ -40,11 +56,29 @@ export default function BlogListing() {
     "@type": "CollectionPage",
     "name": activeCategory ? `${activeCategory} Articles - RED.NEXUS` : "Blog - RED.NEXUS",
     "description": "Browse our complete collection of deep dives, analyses, and research papers across the technology landscape.",
-    "url": activeCategory ? `${baseUrl}/blog?category=${activeCategory}` : `${baseUrl}/blog`
+    "url": activeCategory ? `${baseUrl}/blog?category=${activeCategory}` : `${baseUrl}/blog`,
+    "mainEntity": {
+      "@type": "ItemList",
+      "numberOfItems": filteredPosts.length,
+      "itemListElement": filteredPosts.map((post, idx) => ({
+        "@type": "ListItem",
+        "position": idx + 1,
+        "url": `${baseUrl}/blog/${post.slug}`,
+        "name": post.title
+      }))
+    }
   };
+
+  const categoryName = activeCategory ? categories.find(c => c.slug === activeCategory)?.name : null;
+  const pageTitle = categoryName ? `${categoryName} Intelligence Insights` : "Actionable Technical Intelligence Briefs";
 
   return (
     <div className="w-full pt-12 pb-24 bg-[#050505]">
+      <MetaTags 
+        title={pageTitle}
+        description={categoryName ? `Deep-dive analyses and research reports focusing on the frontier of ${categoryName}.` : "Browse our complete collection of deep technical dives and briefs on computer platforms, cyber structures, and artificial intelligence architectures."}
+        keywords="computation, technology intelligence, research papers, technology analytics, technical briefs"
+      />
       <JsonLd data={schema} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -111,7 +145,13 @@ export default function BlogListing() {
         </div>
 
         {/* Post Grid */}
-        {filteredPosts.length > 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <BlogCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : filteredPosts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post, i) => (
               <PostCard key={post.id} post={post} index={i} />

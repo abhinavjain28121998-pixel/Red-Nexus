@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/utils";
 import { useTheme } from "../ThemeContext";
+import { useSearch } from "../SearchContext";
 
 const links = [
   { name: "Home", href: "/" },
@@ -17,10 +18,11 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { openSearch } = useSearch();
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-50 bg-theme-bg/90 backdrop-blur-md border-b border-theme-border transition-colors duration-300 tech-nav">
+      <nav className="w-full tech-nav" id="main-navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
@@ -62,7 +64,11 @@ export function Navbar() {
 
             {/* Right section */}
             <div className="flex items-center gap-2 md:gap-4">
-              <button className="p-2 text-theme-text-dim hover:text-theme-text transition-colors" aria-label="Search">
+              <button 
+                onClick={openSearch}
+                className="p-2 text-theme-text-dim hover:text-theme-text transition-colors" 
+                aria-label="Search"
+              >
                 <Search className="w-5 h-5" />
               </button>
 
@@ -123,12 +129,16 @@ export function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <div className="mt-8 relative">
-                <input
-                  type="text"
-                  placeholder="Search articles..."
-                  className="w-full bg-theme-card border border-theme-border px-4 py-4 rounded-md text-theme-text pl-12 focus:outline-none focus:border-red-500/50 text-sm font-medium focus:ring-1 focus:ring-red-500/50 transition-all placeholder:text-theme-text-dim/50"
-                />
+              <div 
+                onClick={() => {
+                  setIsOpen(false);
+                  openSearch();
+                }}
+                className="mt-8 relative cursor-pointer"
+              >
+                <div className="w-full bg-theme-card border border-theme-border px-4 py-4 rounded-md text-theme-text-dim/50 pl-12 text-sm font-medium select-none">
+                  Search articles...
+                </div>
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-theme-text-dim/50" />
               </div>
               <button className="bg-red-600 text-white text-xs font-bold uppercase tracking-widest px-6 py-4 mt-4 hover:bg-theme-text hover:text-theme-bg transition-colors duration-300 rounded-md w-full">
