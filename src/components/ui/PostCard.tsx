@@ -36,11 +36,15 @@ export function PostCard({ post, featured, className, index = 0 }: PostCardProps
           className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700 group-hover:scale-105 transform"
         />
         <div className="absolute top-4 left-4 z-20">
-           <span className={cn(
-             "px-3 py-1.5 text-xs font-bold uppercase tracking-widest bg-red-600 text-white"
-           )}>
-             {post.category.name}
-           </span>
+          <Link
+            to={`/blog?category=${post.category.slug}`}
+            className={cn(
+              "px-3 py-1.5 text-xs font-bold uppercase tracking-widest bg-red-600 text-white hover:bg-white hover:text-black transition-colors block font-sans"
+            )}
+            id={`postcard-category-${post.id}`}
+          >
+            {post.category.name}
+          </Link>
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Search, Filter } from "lucide-react";
@@ -12,13 +12,15 @@ import { BlogCardSkeleton } from "../components/ui/Skeleton";
 export default function BlogListing() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category");
+  const initialSearch = searchParams.get("search") || "";
   
   const [activeCategory, setActiveCategory] = useState<string | null>(initialCategory);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setActiveCategory(searchParams.get("category"));
+    setSearchQuery(searchParams.get("search") || "");
   }, [searchParams]);
 
   // Simulate modern analytical data fetching loader when active filters change
@@ -32,11 +34,26 @@ export default function BlogListing() {
 
   const handleCategoryChange = (slug: string | null) => {
     setActiveCategory(slug);
+    const params: { [key: string]: string } = {};
     if (slug) {
-      setSearchParams({ category: slug });
-    } else {
-      setSearchParams({});
+      params.category = slug;
     }
+    if (searchQuery) {
+      params.search = searchQuery;
+    }
+    setSearchParams(params);
+  };
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    const params: { [key: string]: string } = {};
+    if (activeCategory) {
+      params.category = activeCategory;
+    }
+    if (query) {
+      params.search = query;
+    }
+    setSearchParams(params);
   };
 
   const filteredPosts = mockPosts.filter((post) => {
@@ -103,9 +120,9 @@ export default function BlogListing() {
         {/* Filters and Search */}
         <div className="flex flex-col lg:flex-row gap-6 mb-12 items-center justify-between bg-[#0a0a0a] p-4 border border-white/10 rounded-xl">
           {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 w-full lg:w-auto hide-scrollbar">
-            <button
-              onClick={() => handleCategoryChange(null)}
+          <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 w-full lg:w-auto hide-scrollbar" id="categories-filter-links">
+            <Link
+              to={searchQuery ? `/blog?search=${encodeURIComponent(searchQuery)}` : "/blog"}
               className={cn(
                 "px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-300",
                 activeCategory === null 
@@ -114,21 +131,28 @@ export default function BlogListing() {
               )}
             >
               All Topics
-            </button>
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => handleCategoryChange(category.slug)}
-                className={cn(
-                  "px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-300",
-                  activeCategory === category.slug
-                    ? "bg-red-600 text-white"
-                    : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
-                )}
-              >
-                {category.name}
-              </button>
-            ))}
+            </Link>
+            {categories.map((category) => {
+              const queryParams = new URLSearchParams();
+              queryParams.set("category", category.slug);
+              if (searchQuery) {
+                queryParams.set("search", searchQuery);
+              }
+              return (
+                <Link
+                  key={category.id}
+                  to={`/blog?${queryParams.toString()}`}
+                  className={cn(
+                    "px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-300",
+                    activeCategory === category.slug
+                      ? "bg-red-600 text-white"
+                      : "bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white"
+                  )}
+                >
+                  {category.name}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Search */}
@@ -138,8 +162,9 @@ export default function BlogListing() {
               type="text"
               placeholder="Search intelligence..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full bg-[#050505] border border-white/10 rounded-full pl-11 pr-4 py-3 text-white text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-red-500/50 transition-colors placeholder:text-gray-500"
+              id="search-intelligence-input"
             />
           </div>
         </div>
@@ -162,12 +187,13 @@ export default function BlogListing() {
             <Filter className="w-12 h-12 text-white/30 mx-auto mb-4" />
             <h3 className="text-2xl font-black uppercase tracking-tighter text-white mb-2 italic">Nothing matching intelligence</h3>
             <p className="text-white/50">Try adjusting your filters or search terms to find what you're looking for.</p>
-            <button 
-              onClick={() => { handleCategoryChange(null); setSearchQuery(""); }}
-              className="mt-6 text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-white transition-colors"
+            <Link 
+              to="/blog"
+              className="mt-6 inline-block text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-white transition-colors"
+              id="reset-filters-link"
             >
               Reset Filters
-            </button>
+            </Link>
           </div>
         )}
       </div>

@@ -239,11 +239,15 @@ export default function SinglePost() {
             </Link>
             
               <div className="flex flex-wrap items-center gap-4 mb-6">
-              <span className={cn(
-                "px-3 py-1.5 text-xs uppercase font-bold tracking-widest bg-red-600 text-white"
-              )}>
+              <Link
+                to={`/blog?category=${post.category.slug}`}
+                className={cn(
+                  "px-3 py-1.5 text-xs uppercase font-bold tracking-widest bg-red-600 text-white hover:bg-white hover:text-black transition-colors block font-sans"
+                )}
+                id="singlepost-hero-category"
+              >
                 {post.category.name}
-              </span>
+              </Link>
               <div className="text-xs uppercase tracking-widest font-bold text-theme-text-dim flex items-center gap-2">
                 <time dateTime={post.publishedAt}>
                   {format(new Date(post.publishedAt), "MMM d, yyyy")}
@@ -399,9 +403,14 @@ export default function SinglePost() {
             <div className="mt-16 pt-8 border-t border-theme-border flex flex-wrap gap-2 items-center">
               <span className="text-xs font-bold uppercase tracking-widest text-theme-text-dim mr-2 flex items-center">Tags:</span>
               {post.tags.map(tag => (
-                <span key={tag} className="px-3 py-1.5 bg-theme-text/5 border border-theme-border text-xs font-bold tracking-widest uppercase text-theme-text-muted cursor-pointer hover:bg-theme-text/10 hover:text-theme-text transition-colors rounded">
-                  {tag}
-                </span>
+                <Link 
+                  key={tag} 
+                  to={`/blog?search=${encodeURIComponent(tag)}`}
+                  className="px-3 py-1.5 bg-theme-text/5 border border-theme-border text-xs font-bold tracking-widest uppercase text-theme-text-muted hover:bg-theme-text/10 hover:text-red-500 hover:border-red-500/30 transition-all rounded font-mono"
+                  id={`singlepost-tag-${tag}`}
+                >
+                  #{tag}
+                </Link>
               ))}
             </div>
 
